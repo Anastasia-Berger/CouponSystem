@@ -5,8 +5,9 @@ import com.jb.CouponSystem.repos.CompanyRepository;
 import com.jb.CouponSystem.repos.CouponRepository;
 import com.jb.CouponSystem.repos.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public abstract class ClientService {
 
     @Autowired

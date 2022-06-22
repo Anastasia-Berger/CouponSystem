@@ -13,8 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-
-
 public class Customer {
 
     @Id

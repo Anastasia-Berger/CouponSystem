@@ -8,7 +8,7 @@ import com.jb.CouponSystem.login.LoginManager;
 import com.jb.CouponSystem.repos.CompanyRepository;
 import com.jb.CouponSystem.repos.CouponRepository;
 import com.jb.CouponSystem.repos.CustomerRepository;
-import com.jb.CouponSystem.services.AdminService;
+import com.jb.CouponSystem.services.AdminServiceImpl;
 import com.jb.CouponSystem.services.CompanyService;
 import com.jb.CouponSystem.services.CustomerService;
 import com.jb.CouponSystem.shedule.CouponExpirationDailyJob;
@@ -16,7 +16,6 @@ import com.jb.CouponSystem.utils.Art;
 import com.jb.CouponSystem.utils.TablePrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
@@ -34,7 +33,7 @@ public class Bootstrap implements CommandLineRunner {
     @Autowired
     private CouponRepository couponRepository;
     @Autowired
-    private AdminService adminService;
+    private AdminServiceImpl adminService;
     @Autowired
     private CompanyService companyService;
     @Autowired
@@ -43,10 +42,6 @@ public class Bootstrap implements CommandLineRunner {
     private CustomerService customerService;
     @Autowired
     private CouponExpirationDailyJob couponExpirationDailyJob;
-
-    public Bootstrap() {
-    }
-
 
     @Override
     public void run(String... args) throws Exception {
