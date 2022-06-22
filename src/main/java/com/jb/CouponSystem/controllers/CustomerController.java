@@ -57,7 +57,7 @@ public class CustomerController {
 
     @GetMapping("coupons/category")
     public ResponseEntity<?> getCoupons(@RequestHeader("Authorization") String token, @RequestParam Category category) throws CouponSystemException {
-        if (tokenManager.isTokenClientType(token, ClientType.COMPANY)) {
+        if (tokenManager.isTokenClientType(token, ClientType.CUSTOMER)) {
             CustomerService customerService = (CustomerService) tokenManager.get(token).getClientService();
             return new ResponseEntity<>(customerService.getCustomerCoupons(category), HttpStatus.OK);
         }
@@ -66,7 +66,7 @@ public class CustomerController {
 
     @GetMapping("coupons/")
     public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") String token, @RequestBody double maxPrice) throws CouponSystemException {
-        if (tokenManager.isTokenClientType(token, ClientType.COMPANY)) {
+        if (tokenManager.isTokenClientType(token, ClientType.CUSTOMER)) {
             CustomerService customerService = (CustomerService) tokenManager.get(token).getClientService();
             return new ResponseEntity<>(customerService.getCustomerCoupons(maxPrice), HttpStatus.OK);
         }
