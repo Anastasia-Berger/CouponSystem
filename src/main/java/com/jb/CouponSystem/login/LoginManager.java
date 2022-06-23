@@ -3,39 +3,49 @@ package com.jb.CouponSystem.login;
 import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
-import com.jb.CouponSystem.services.AdminService;
-import com.jb.CouponSystem.services.ClientService;
-import com.jb.CouponSystem.services.CompanyService;
-import com.jb.CouponSystem.services.CustomerService;
+import com.jb.CouponSystem.services.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
 public class LoginManager {
 
-    private final AdminService adminService;
-    private final CompanyService companyService;
-    private final CustomerService customerService;
+    @Autowired
+    private CustomerServiceImpl customerService;
+    @Autowired
+    private AdminServiceImpl adminService;
+    @Autowired
+    private CompanyServiceImpl companyService;
+    @Autowired
+    private TokenManager tokenManager;
 
-    public ClientService login(ClientType clientType, String email, String password) throws CouponSystemException {
-        ClientService result = null;
+    public LoginResponse login(String email, String password, ClientType clientType) throws CouponSystemException {
         switch (clientType) {
+
             case ADMINISTRATOR:
-                result = (adminService.login(email, password))? adminService:null;
+                if (adminService.login(email, password)) {
+                    return new LoginResponse(tokenManager.createToken(adminService));
+                }
                 break;
+
             case COMPANY:
-                result = (companyService.login(email, password))? companyService:null;
+                if (companyService.login(email, password)) {
+                    return new LoginResponse(tokenManager.createToken(companyService));
+                }
                 break;
+
             case CUSTOMER:
-                result = (customerService.login(email, password))? customerService:null;
+                if (customerService.login(email, password)) {
+                    return new LoginResponse(tokenManager.createToken(customerService));
+                }
                 break;
+
             default:
                 throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
         }
-        if (result == null) {
-            throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
-        }
-        return result;
+        return null;
     }
 }

@@ -10,7 +10,6 @@ public class CouponSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CouponSystemApplication.class, args);
 		System.out.println(Art.START);
-
 	}
 
 }

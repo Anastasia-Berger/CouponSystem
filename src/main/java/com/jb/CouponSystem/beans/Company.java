@@ -37,9 +37,8 @@ public class Company {
     public void setId(int id) throws CouponSystemException {
         if (this.id == 0) {
             this.id = id;
-        } else {
-            throw new CouponSystemException(ErrMsg.ILLEGAL_ACTION_EXCEPTION);
         }
+        throw new CouponSystemException(ErrMsg.ILLEGAL_ACTION_EXCEPTION);
     }
 
 }
