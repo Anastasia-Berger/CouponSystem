@@ -75,22 +75,22 @@ public class CompanyController extends ClientController{
         companyService.deleteCoupon(id);
     }
 
-    @GetMapping("company")
+    @GetMapping("company/coupons")
     public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") String token) {
         return new ResponseEntity<>(companyService.getCompanyCoupons(), HttpStatus.OK);
     }
 
-    @GetMapping("company")
+    @GetMapping("company/category")
     public ResponseEntity<?> getCoupons(@RequestHeader("Authorization") String token, @RequestParam Category category) {
         return new ResponseEntity<>(companyService.getCompanyCoupons(category), HttpStatus.OK);
     }
 
-    @GetMapping("company")
+    @GetMapping("company/max-price")
     public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") String token, @RequestBody double maxPrice) {
         return new ResponseEntity<>(companyService.getCompanyCoupons(maxPrice), HttpStatus.OK);
     }
 
-    @GetMapping("company")
+    @GetMapping("company/details")
     @ResponseStatus(HttpStatus.OK)
     public Company getCompanyDetails(@RequestHeader("Authorization") String token) {
         return companyService.getCompanyDetails();
