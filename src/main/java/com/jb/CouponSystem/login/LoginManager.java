@@ -6,7 +6,6 @@ import com.jb.CouponSystem.exeptions.ErrMsg;
 import com.jb.CouponSystem.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -23,6 +22,7 @@ public class LoginManager {
     private TokenManager tokenManager;
 
     public LoginResponse login(String email, String password, ClientType clientType) throws CouponSystemException {
+
         switch (clientType) {
 
             case ADMINISTRATOR:

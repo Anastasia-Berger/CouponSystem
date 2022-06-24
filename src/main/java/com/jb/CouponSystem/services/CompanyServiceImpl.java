@@ -2,9 +2,11 @@ package com.jb.CouponSystem.services;
 
 import com.jb.CouponSystem.beans.Company;
 import com.jb.CouponSystem.beans.Coupon;
+import com.jb.CouponSystem.dto.CouponDto;
 import com.jb.CouponSystem.enums.Category;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
+import com.jb.CouponSystem.mappers.CouponMapper;
 import com.jb.CouponSystem.repos.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -16,10 +18,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class CompanyServiceImpl  extends ClientService implements CompanyService{
+public class CompanyServiceImpl extends ClientService implements CompanyService {
 
     @Autowired
     private CompanyRepository companyRepository;
+    private CouponMapper couponMapper;
 
     private int companyID;
     private Company currentCompany;
@@ -42,7 +45,7 @@ public class CompanyServiceImpl  extends ClientService implements CompanyService
         return true;
     }
 
-    public void addCoupon(Coupon coupon) throws CouponSystemException {
+    public CouponDto addCoupon(Coupon coupon) throws CouponSystemException {
 
         for (Coupon companyCoupon : currentCompany.getCoupons()) {
             if (companyCoupon.getTitle().equals(coupon.getTitle()))
@@ -50,11 +53,12 @@ public class CompanyServiceImpl  extends ClientService implements CompanyService
         }
 
         //Saving coupon as ManyToOne bi-directional will automatically update the company coupon list
-        couponRepository.save(coupon);
+//        couponRepository.save(coupon);
 
         // Updating the plain object to include all new coupons.
         List<Coupon> updatedCouponList = companyRepository.getOne(currentCompany.getId()).getCoupons();
         currentCompany.setCoupons(updatedCouponList);
+        return couponMapper.toDto(couponRepository.save(coupon));
     }
 
     public void updateCoupon(Coupon coupon) throws CouponSystemException {
@@ -66,8 +70,8 @@ public class CompanyServiceImpl  extends ClientService implements CompanyService
         if (CompanyOfCoupon != coupon.getCompany().getId())
             throw new CouponSystemException(ErrMsg.ILLEGAL_ACTION_EXCEPTION);
 
-        if(coupon.getAmount()<=0)  throw new CouponSystemException(ErrMsg.ZERO_VALUE);
-        if(coupon.getPrice()<=0)  throw new CouponSystemException(ErrMsg.ZERO_VALUE);
+        if (coupon.getAmount() <= 0) throw new CouponSystemException(ErrMsg.ZERO_VALUE);
+        if (coupon.getPrice() <= 0) throw new CouponSystemException(ErrMsg.ZERO_VALUE);
 
         couponRepository.saveAndFlush(coupon);
 
@@ -106,23 +110,24 @@ public class CompanyServiceImpl  extends ClientService implements CompanyService
     }
 
     public boolean isTitleExists(String title) {
-        long isExists= this.currentCompany.getCoupons().stream()
-                .filter(coupon->coupon.getTitle().toLowerCase().equals(title.toLowerCase())).count();
+        long isExists = this.currentCompany.getCoupons().stream()
+                .filter(coupon -> coupon.getTitle().toLowerCase().equals(title.toLowerCase())).count();
 
         return isExists > 0;
 
     }
 
     public int getTotalPurchases() {
-        int sumOfPurchases=0;
-        for(Coupon coupon : currentCompany.getCoupons()) {
+        int sumOfPurchases = 0;
+        for (Coupon coupon : currentCompany.getCoupons()) {
             System.out.println(coupon);
             System.out.println(couponRepository.allPurchasesOfCoupon(coupon.getId()));
-            sumOfPurchases+= couponRepository.allPurchasesOfCoupon(coupon.getId());
+            sumOfPurchases += couponRepository.allPurchasesOfCoupon(coupon.getId());
         }
 
         return sumOfPurchases;
     }
+
     public Company getCompanyDetails() {
         return currentCompany;
     }

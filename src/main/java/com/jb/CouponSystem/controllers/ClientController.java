@@ -5,14 +5,16 @@ import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
 import com.jb.CouponSystem.login.LoginManager;
 import com.jb.CouponSystem.login.TokenManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("customer")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
+@RequestMapping("api/client")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*",allowedHeaders = "*")
 public abstract class ClientController {
 
     @Autowired

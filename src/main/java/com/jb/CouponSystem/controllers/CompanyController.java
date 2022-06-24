@@ -2,6 +2,7 @@ package com.jb.CouponSystem.controllers;
 
 import com.jb.CouponSystem.beans.Company;
 import com.jb.CouponSystem.beans.Coupon;
+import com.jb.CouponSystem.dto.CouponDto;
 import com.jb.CouponSystem.enums.Category;
 import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
@@ -27,8 +28,9 @@ import java.io.ByteArrayInputStream;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("company")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
+@RequestMapping("api/company")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*",allowedHeaders = "*")
 public class CompanyController extends ClientController{
 
     @Autowired
@@ -57,10 +59,10 @@ public class CompanyController extends ClientController{
 
     ////////////////////   COUPONS   ////////////////////////
 
-    @PostMapping("coupon")
-    public ResponseEntity<?> addCoupon(@RequestHeader("Authorization") String token, @RequestBody Coupon coupon) throws CouponSystemException {
-        companyService.addCoupon(coupon);
-        return new ResponseEntity<>(coupon, HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("api/coupon")
+    public CouponDto addCoupon(@RequestHeader("Authorization") String token, @RequestBody Coupon coupon) throws CouponSystemException {
+        return companyService.addCoupon(coupon);
     }
 
     @PutMapping("coupon/{id}")
@@ -75,7 +77,7 @@ public class CompanyController extends ClientController{
         companyService.deleteCoupon(id);
     }
 
-    @GetMapping("company/coupons")
+    @GetMapping("company-coupons")
     public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") String token) {
         return new ResponseEntity<>(companyService.getCompanyCoupons(), HttpStatus.OK);
     }

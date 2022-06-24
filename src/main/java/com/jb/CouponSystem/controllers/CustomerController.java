@@ -15,8 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("customer")
-@CrossOrigin(origins = "http://localhost:3000", allowedHeaders = "*", allowCredentials = "true")
+@RequestMapping("api/customer")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*",allowedHeaders = "*")
 public class CustomerController {
 
     @Autowired
