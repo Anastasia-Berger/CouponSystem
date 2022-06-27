@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/company")
-@RequiredArgsConstructor
+@RequestMapping("company")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CompanyController {
 
@@ -49,7 +48,7 @@ public class CompanyController {
 
     ////////////////////   COUPONS   ////////////////////////
 
-    @PostMapping("coupon")
+    @PostMapping("coupon/add")
     @ResponseStatus(HttpStatus.CREATED)
     public CouponDto addCoupon(@RequestHeader("Authorization") UUID token, @RequestBody CouponDto couponDto) throws CouponSystemException {
         int userId = tokenManager.getUserID(token);

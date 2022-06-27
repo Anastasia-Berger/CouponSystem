@@ -21,11 +21,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class CompanyServiceImpl extends ClientService  implements CompanyService {
 
     @Autowired
     private CompanyRepository companyRepository;
+
     private CouponMapper couponMapper;
 
     @Autowired

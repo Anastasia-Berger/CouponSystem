@@ -49,7 +49,7 @@ public class Bootstrap implements CommandLineRunner {
         System.out.println(Art.BOOTSTRAP);
 
         Company company1 = Company.builder()
-                .name("Company 1")
+                .name("Company1")
 
                 .email("company1@gmail.com")
                 .password("1234")
@@ -58,7 +58,7 @@ public class Bootstrap implements CommandLineRunner {
                 .build();
 
         Company company2 = Company.builder()
-                .name("Company 2")
+                .name("Company2")
 
                 .email("company2@gmail.com")
                 .password("1234")
@@ -67,7 +67,7 @@ public class Bootstrap implements CommandLineRunner {
                 .build();
 
         Company company3 = Company.builder()
-                .name("Company 3")
+                .name("Company3")
 
                 .email("company3@gmail.com")
                 .password("1234")
@@ -137,6 +137,18 @@ public class Bootstrap implements CommandLineRunner {
                 .description("blablabla3")
                 .title("title 3")
                 .company(companyRepository.getById(3))
+                .build();
+
+        Coupon coupon4 = Coupon.builder()
+                .amount(70)
+                .price(10)
+                .image("Coupon_4")
+                .startDate(Date.valueOf(LocalDate.now()))
+                .endDate(Date.valueOf(LocalDate.now().plusDays(7)))
+                .category(Category.VACATION)
+                .description("blablabla4")
+                .title("title 4")
+                .company(company1)
                 .build();
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

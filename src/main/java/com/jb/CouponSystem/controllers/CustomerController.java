@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/customer")
+@RequestMapping("customer")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*",allowedHeaders = "*")
 public class CustomerController {
