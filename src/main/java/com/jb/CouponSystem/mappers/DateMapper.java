@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Component
 public class DateMapper {
