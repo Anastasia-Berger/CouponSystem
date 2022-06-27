@@ -6,19 +6,20 @@ import com.jb.CouponSystem.dto.CouponDto;
 import com.jb.CouponSystem.enums.Category;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import java.util.List;
+import java.util.UUID;
 
 public interface CompanyService {
 
     ////////////////////   LOGIN   ////////////////////////
-    public boolean login(String email, String password) throws CouponSystemException;
+    public UUID login(String email, String password) throws CouponSystemException;
 
     ////////////////////   COMPANY DETAILS   ////////////////////////
     public Company getCompanyDetails();
     public int getTotalPurchases();
 
     ////////////////////   COUPONS   ////////////////////////
-    public CouponDto addCoupon(Coupon coupon) throws CouponSystemException;
-    public void updateCoupon(Coupon coupon) throws CouponSystemException;
+    public CouponDto addCoupon(int companyID, CouponDto couponDto) throws CouponSystemException;
+    public CouponDto updateCoupon(int companyID, int couponID, CouponDto CouponDto) throws CouponSystemException;
     public void deleteCoupon(int couponId);
     public boolean isTitleExists(String title);
 

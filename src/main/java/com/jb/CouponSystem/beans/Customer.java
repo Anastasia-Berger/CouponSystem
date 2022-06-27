@@ -1,5 +1,6 @@
 package com.jb.CouponSystem.beans;
 
+import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
 import lombok.*;
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class Customer {
+public class Customer extends Base{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +31,9 @@ public class Customer {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private ClientType clientType;
+
     @ManyToMany
     @JoinTable(name = "customer_vs_coupons")
     private List<Coupon> coupons = new ArrayList<>();
@@ -41,6 +45,5 @@ public class Customer {
             throw new CouponSystemException(ErrMsg.ILLEGAL_ACTION_EXCEPTION);
         }
     }
-
 
 }

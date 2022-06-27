@@ -3,15 +3,19 @@ package com.jb.CouponSystem.services;
 import com.jb.CouponSystem.beans.Company;
 import com.jb.CouponSystem.beans.Coupon;
 import com.jb.CouponSystem.beans.Customer;
+import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
 import com.jb.CouponSystem.repos.CompanyRepository;
 import com.jb.CouponSystem.repos.CouponRepository;
 import com.jb.CouponSystem.repos.CustomerRepository;
+import com.jb.CouponSystem.security.Information;
+import com.jb.CouponSystem.security.TokenManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AdminServiceImpl extends ClientService implements AdminService {
@@ -19,24 +23,26 @@ public class AdminServiceImpl extends ClientService implements AdminService {
     private final String ADMIN_EMAIL = "admin@admin.com";
     private final String ADMIN_PASSWORD = "admin";
 
-
     @Autowired
     private CompanyRepository companyRepository;
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
     private CouponRepository couponRepository;
+    @Autowired
+    private TokenManager tokenManager;
 
     @Override
-    public boolean login(String email, String password) throws CouponSystemException {
+    public UUID login(String email, String password) throws CouponSystemException {
         if (!email.equals(ADMIN_EMAIL)) throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
         if (!password.equals(ADMIN_PASSWORD)) throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
-        return true;
+
+        ClientType clientType = ClientType.ADMINISTRATOR;
+        Information information = new Information(email, clientType);
+        return tokenManager.addToken(information);
     }
 
-
     public void addCompany(Company company) throws CouponSystemException {
-
         // Check name
         if (companyRepository.existsByName(company.getName())) {
             throw new CouponSystemException(ErrMsg.COMPANY_ALREADY_EXIST);
@@ -47,7 +53,6 @@ public class AdminServiceImpl extends ClientService implements AdminService {
         }
         companyRepository.save(company);
     }
-
 
     public void updateCompany(Company company) throws CouponSystemException {
 
@@ -61,7 +66,6 @@ public class AdminServiceImpl extends ClientService implements AdminService {
         companyRepository.saveAndFlush(company);
 
     }
-
 
     public void deleteCompany(int companyID) throws CouponSystemException {
 
@@ -108,7 +112,7 @@ public class AdminServiceImpl extends ClientService implements AdminService {
 
     }
 
-    public Boolean companyExistsByName(String companyName) {
+    public boolean companyExistsByName(String companyName) {
         return this.companyRepository.existsByName(companyName);
     }
 

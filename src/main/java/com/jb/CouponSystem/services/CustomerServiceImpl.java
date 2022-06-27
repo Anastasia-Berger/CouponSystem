@@ -3,8 +3,12 @@ package com.jb.CouponSystem.services;
 import com.jb.CouponSystem.beans.Coupon;
 import com.jb.CouponSystem.beans.Customer;
 import com.jb.CouponSystem.enums.Category;
+import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
+import com.jb.CouponSystem.security.Information;
+import com.jb.CouponSystem.security.TokenManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,9 +26,29 @@ public class CustomerServiceImpl extends ClientService implements CustomerServic
     private int customerId;
     private Customer currentCustomer;
 
+    @Autowired
+    private TokenManager tokenManager;
+
+
+//    @Override
+//    public boolean login(String email, String password) throws CouponSystemException {
+//
+//        if (!customerRepository.existsByEmail(email))
+//            throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
+//
+//        Customer customer = customerRepository.findByEmail(email);
+//
+//        if (!customer.getPassword().equals(password))
+//            throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
+//
+//
+//        this.currentCustomer = customer;
+//        this.customerId = currentCustomer.getId();
+//        return true;
+//    }
 
     @Override
-    public boolean login(String email, String password) throws CouponSystemException {
+    public UUID login(String email, String password) throws CouponSystemException {
 
         if (!customerRepository.existsByEmail(email))
             throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
@@ -33,12 +58,12 @@ public class CustomerServiceImpl extends ClientService implements CustomerServic
         if (!customer.getPassword().equals(password))
             throw new CouponSystemException(ErrMsg.INCORRECT_LOGIN);
 
+        int customerId = customer.getId();
+        ClientType clientType = customer.getClientType();
 
-        this.currentCustomer = customer;
-        this.customerId = currentCustomer.getId();
-        return true;
+        Information information = new Information(customerId, email, clientType);
+        return tokenManager.addToken(information);
     }
-
 
     public void purchaseCoupon(Coupon coupon) throws CouponSystemException {
 

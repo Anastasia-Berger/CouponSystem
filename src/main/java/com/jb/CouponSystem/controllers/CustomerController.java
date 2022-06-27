@@ -1,18 +1,21 @@
 package com.jb.CouponSystem.controllers;
 
 import com.jb.CouponSystem.beans.Coupon;
+import com.jb.CouponSystem.dto.LoginReqDto;
+import com.jb.CouponSystem.dto.LoginResDto;
 import com.jb.CouponSystem.enums.Category;
 import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
-import com.jb.CouponSystem.login.LoginManager;
-import com.jb.CouponSystem.login.TokenManager;
+import com.jb.CouponSystem.security.TokenManager;
 import com.jb.CouponSystem.services.CustomerService;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/customer")
@@ -24,51 +27,51 @@ public class CustomerController {
     private CustomerService customerService;
     @Autowired
     private TokenManager tokenManager;
-    @Autowired
-    private LoginManager loginManager;
 
+
+    private LoginResDto loginResDto;
+    private LoginReqDto loginReqDto;
 
     ////////////////////   LOGIN   ////////////////////////
 
-    @PostMapping("login/{email}/{password}")
-    public ResponseEntity<?> login(@PathVariable(name = "email") String email, @PathVariable(name = "password") String password) {
-        try {
-            return new ResponseEntity<>(loginManager.login(email, password, ClientType.CUSTOMER), HttpStatus.CREATED);
-        } catch (CouponSystemException e) {
-            return new ResponseEntity<>(ErrMsg.UNAUTHORIZED_EVENT, HttpStatus.UNAUTHORIZED);
-        }
+    @PostMapping("login")
+    @ResponseStatus(HttpStatus.CREATED)
+    public LoginResDto login(@RequestBody LoginReqDto loginReqDto) throws CouponSystemException {
+        String email = loginReqDto.getEmail();
+        String password = loginReqDto.getPassword();
+        UUID uuid = customerService.login(email, password);
+        ClientType clientType = tokenManager.getClientType(uuid);
+        return new LoginResDto(email,uuid,clientType);
     }
 
     @DeleteMapping("logout")
-    public ResponseEntity<?> logout(@RequestHeader("authorization") String token) {
-        tokenManager.deleteToken(token);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public void logout(@RequestHeader("Authorization") UUID token) throws CouponSystemException {
+        int id = tokenManager.getUserID(token);
+        tokenManager.deleteEntriesByUserId(id);
     }
 
     ////////////////////   CUSTOMER COUPONS   ////////////////////////
 
-    @GetMapping("customer-coupons")
-    public ResponseEntity<?> getCustomerCoupons(@RequestHeader("Authorization") String token) throws CouponSystemException {
-        if (tokenManager.isTokenClientType(token, ClientType.CUSTOMER)) {
-            CustomerService customerService = (CustomerService) tokenManager.get(token).getClientService();
+    @GetMapping("coupons")
+    public ResponseEntity<?> getCustomerCoupons(@RequestHeader("Authorization") UUID token) throws CouponSystemException {
+        if (tokenManager.getClientType(token).equals(ClientType.CUSTOMER)) {
             return new ResponseEntity<>(customerService.getCustomerCoupons(), HttpStatus.OK);
         }
         return new ResponseEntity<>(new CouponSystemException(ErrMsg.UNAUTHORIZED_EVENT), HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("coupons/category")
-    public ResponseEntity<?> getCoupons(@RequestHeader("Authorization") String token, @RequestParam Category category) throws CouponSystemException {
-        if (tokenManager.isTokenClientType(token, ClientType.CUSTOMER)) {
-            CustomerService customerService = (CustomerService) tokenManager.get(token).getClientService();
+    public ResponseEntity<?> getCoupons(@RequestHeader("Authorization") UUID token, @RequestParam Category category) throws CouponSystemException {
+        if (tokenManager.getClientType(token).equals(ClientType.CUSTOMER)) {
             return new ResponseEntity<>(customerService.getCustomerCoupons(category), HttpStatus.OK);
         }
         return new ResponseEntity<>(new CouponSystemException(ErrMsg.UNAUTHORIZED_EVENT), HttpStatus.UNAUTHORIZED);
     }
 
-    @GetMapping("coupons/")
-    public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") String token, @RequestBody double maxPrice) throws CouponSystemException {
-        if (tokenManager.isTokenClientType(token, ClientType.CUSTOMER)) {
-            CustomerService customerService = (CustomerService) tokenManager.get(token).getClientService();
+    @GetMapping("coupons/max-price")
+    public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") UUID token, @RequestBody double maxPrice) throws CouponSystemException {
+        if (tokenManager.getClientType(token).equals(ClientType.CUSTOMER)) {
             return new ResponseEntity<>(customerService.getCustomerCoupons(maxPrice), HttpStatus.OK);
         }
         return new ResponseEntity<>(new CouponSystemException(ErrMsg.UNAUTHORIZED_EVENT), HttpStatus.UNAUTHORIZED);
@@ -77,9 +80,8 @@ public class CustomerController {
     ////////////////////   CUSTOMER   ////////////////////////
 
     @GetMapping("customer/details")
-    public ResponseEntity<?> getCustomerDetails(@RequestHeader("Authorization") String token) throws CouponSystemException {
-        if (tokenManager.isTokenClientType(token, ClientType.CUSTOMER)) {
-            CustomerService customerService = (CustomerService) tokenManager.get(token).getClientService();
+    public ResponseEntity<?> getCustomerDetails(@RequestHeader("Authorization") UUID token) throws CouponSystemException {
+        if (tokenManager.getClientType(token).equals(ClientType.CUSTOMER)) {
             return new ResponseEntity<>(customerService.getCustomerDetails(), HttpStatus.OK);
         }
         return new ResponseEntity<>(new CouponSystemException(ErrMsg.UNAUTHORIZED_EVENT), HttpStatus.UNAUTHORIZED);
@@ -87,9 +89,8 @@ public class CustomerController {
 
     @PostMapping("purchase-coupon")
     @SneakyThrows
-    public ResponseEntity<?> purchaseCoupon(@RequestHeader("authorization") String token, @RequestBody Coupon coupon) {
-        if (tokenManager.isTokenClientType(token, ClientType.CUSTOMER)) {
-            CustomerService customerService = (CustomerService) tokenManager.get(token).getClientService();
+    public ResponseEntity<?> purchaseCoupon(@RequestHeader("Authorization") UUID token, @RequestBody Coupon coupon) {
+        if (tokenManager.getClientType(token).equals(ClientType.CUSTOMER)) {
             customerService.purchaseCoupon(coupon);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

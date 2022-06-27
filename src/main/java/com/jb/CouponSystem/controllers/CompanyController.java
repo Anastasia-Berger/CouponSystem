@@ -1,108 +1,97 @@
 package com.jb.CouponSystem.controllers;
 
 import com.jb.CouponSystem.beans.Company;
-import com.jb.CouponSystem.beans.Coupon;
 import com.jb.CouponSystem.dto.CouponDto;
+import com.jb.CouponSystem.dto.LoginReqDto;
+import com.jb.CouponSystem.dto.LoginResDto;
 import com.jb.CouponSystem.enums.Category;
 import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
-import com.jb.CouponSystem.exeptions.ErrMsg;
-import com.jb.CouponSystem.login.LoginManager;
-import com.jb.CouponSystem.login.TokenManager;
-import com.jb.CouponSystem.repos.CouponRepository;
-import com.jb.CouponSystem.repos.CustomerRepository;
-import com.jb.CouponSystem.services.AdminService;
+import com.jb.CouponSystem.security.TokenManager;
 import com.jb.CouponSystem.services.CompanyService;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayInputStream;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("api/company")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*",allowedHeaders = "*")
-public class CompanyController extends ClientController{
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+public class CompanyController {
 
     @Autowired
     private CompanyService companyService;
     @Autowired
     private TokenManager tokenManager;
-    @Autowired
-    private LoginManager loginManager;
 
     ////////////////////   LOGIN   ////////////////////////
 
-    @PostMapping("login/{email}/{password}")
-    public ResponseEntity<?> login(@PathVariable String email, @PathVariable String password) {
-        try {
-            return new ResponseEntity<>(loginManager.login(email, password, ClientType.COMPANY), HttpStatus.CREATED);
-        } catch (CouponSystemException e) {
-            return new ResponseEntity<>(ErrMsg.UNAUTHORIZED_EVENT, HttpStatus.UNAUTHORIZED);
-        }
+    @PostMapping("login")
+    @ResponseStatus(HttpStatus.CREATED)
+    public LoginResDto login(@RequestBody LoginReqDto loginReqDto) throws CouponSystemException {
+        String email = loginReqDto.getEmail();
+        String password = loginReqDto.getPassword();
+        UUID uuid = companyService.login(email, password);
+        ClientType clientType = tokenManager.getClientType(uuid);
+        return new LoginResDto(email, uuid, clientType);
     }
 
     @DeleteMapping("logout")
-    public ResponseEntity<?> logout(@RequestHeader("authorization") String token){
-        tokenManager.deleteToken(token);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @ResponseStatus(HttpStatus.OK)
+    public void logout(@RequestHeader("Authorization") UUID token) throws CouponSystemException {
+        int id = tokenManager.getUserID(token);
+        tokenManager.deleteEntriesByUserId(id);
     }
 
     ////////////////////   COUPONS   ////////////////////////
 
+    @PostMapping("coupon")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("api/coupon")
-    public CouponDto addCoupon(@RequestHeader("Authorization") String token, @RequestBody Coupon coupon) throws CouponSystemException {
-        return companyService.addCoupon(coupon);
+    public CouponDto addCoupon(@RequestHeader("Authorization") UUID token, @RequestBody CouponDto couponDto) throws CouponSystemException {
+        int userId = tokenManager.getUserID(token);
+        return companyService.addCoupon(userId, couponDto);
     }
 
     @PutMapping("coupon/{id}")
-    public ResponseEntity<?> updateCompany(@RequestHeader("Authorization") String token, @PathVariable int id, @RequestBody Coupon coupon) throws CouponSystemException {
-        companyService.updateCoupon(coupon);
-        return new ResponseEntity<>(coupon, HttpStatus.OK);
+    public ResponseEntity<?> updateCompany(@RequestHeader("Authorization") UUID token, @PathVariable int id, @RequestBody CouponDto couponDto) throws CouponSystemException {
+        companyService.updateCoupon(id, couponDto.getId(), couponDto);
+        return new ResponseEntity<>(couponDto, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("coupon/{id}")
-    public void deleteCoupon(@RequestHeader("Authorization") String token, @PathVariable int id) {
+    public void deleteCoupon(@RequestHeader("Authorization") UUID token, @PathVariable int id) {
         companyService.deleteCoupon(id);
     }
 
-    @GetMapping("company-coupons")
-    public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") String token) {
+    @GetMapping("coupons")
+    public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") UUID token) {
         return new ResponseEntity<>(companyService.getCompanyCoupons(), HttpStatus.OK);
     }
 
     @GetMapping("company/category")
-    public ResponseEntity<?> getCoupons(@RequestHeader("Authorization") String token, @RequestParam Category category) {
+    public ResponseEntity<?> getCoupons(@RequestHeader("Authorization") UUID token, @RequestParam Category category) {
         return new ResponseEntity<>(companyService.getCompanyCoupons(category), HttpStatus.OK);
     }
 
     @GetMapping("company/max-price")
-    public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") String token, @RequestBody double maxPrice) {
+    public ResponseEntity<?> getCompanyCoupons(@RequestHeader("Authorization") UUID token, @RequestBody double maxPrice) {
         return new ResponseEntity<>(companyService.getCompanyCoupons(maxPrice), HttpStatus.OK);
     }
 
     @GetMapping("company/details")
     @ResponseStatus(HttpStatus.OK)
-    public Company getCompanyDetails(@RequestHeader("Authorization") String token) {
+    public Company getCompanyDetails(@RequestHeader("Authorization") UUID token) {
         return companyService.getCompanyDetails();
     }
 
 //
-//
-//
 //    @RequestMapping(value = "coupons/images/{uuid}", method = RequestMethod.GET)
-//    public String getCouponImage(@PathVariable UUID uuid, HttpServletResponse response) throws Exception {
+//    public String getCouponImage(@PathVariable UUID token, HttpServletResponse response) throws Exception {
 //        Image image = imageService.getImage(uuid);
 //
 //        response.setHeader("Content-Disposition", "inline;filename=\"" + image.getId().toString() + "\"");
@@ -114,10 +103,6 @@ public class CompanyController extends ClientController{
 //
 //        return null;
 //    }
-//
-//
-//
-//
 //
 //
 //    @PostMapping("register")
