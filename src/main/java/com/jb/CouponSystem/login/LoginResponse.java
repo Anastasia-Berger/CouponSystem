@@ -1,12 +1,12 @@
-package com.jb.CouponSystem.login;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class LoginResponse {
-    private String token;
-}
+//package com.jb.CouponSystem.login;
+//
+//import lombok.AllArgsConstructor;
+//import lombok.Data;
+//import lombok.NoArgsConstructor;
+//
+//@Data
+//@AllArgsConstructor
+//@NoArgsConstructor
+//public class LoginResponse {
+//    private String token;
+//}

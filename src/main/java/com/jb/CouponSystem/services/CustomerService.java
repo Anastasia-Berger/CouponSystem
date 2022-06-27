@@ -5,11 +5,12 @@ import com.jb.CouponSystem.beans.Customer;
 import com.jb.CouponSystem.enums.Category;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import java.util.List;
+import java.util.UUID;
 
 public interface CustomerService {
 
     ////////////////////   LOGIN   ////////////////////////
-    public boolean login(String email, String password) throws CouponSystemException;
+    public UUID login(String email, String password) throws CouponSystemException;
 
     ////////////////////   CUSTOMER   ////////////////////////
     public Customer getCustomerDetails();

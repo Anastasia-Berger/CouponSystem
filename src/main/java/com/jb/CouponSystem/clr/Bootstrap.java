@@ -4,7 +4,7 @@ import com.jb.CouponSystem.beans.Company;
 import com.jb.CouponSystem.beans.Coupon;
 import com.jb.CouponSystem.beans.Customer;
 import com.jb.CouponSystem.enums.Category;
-import com.jb.CouponSystem.login.LoginManager;
+import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.repos.CompanyRepository;
 import com.jb.CouponSystem.repos.CouponRepository;
 import com.jb.CouponSystem.repos.CustomerRepository;
@@ -22,6 +22,8 @@ import java.sql.Date;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Component
 public class Bootstrap implements CommandLineRunner {
@@ -37,8 +39,6 @@ public class Bootstrap implements CommandLineRunner {
     @Autowired
     private CompanyService companyService;
     @Autowired
-    private LoginManager loginManager;
-    @Autowired
     private CustomerService customerService;
     @Autowired
     private CouponExpirationDailyJob couponExpirationDailyJob;
@@ -49,21 +49,30 @@ public class Bootstrap implements CommandLineRunner {
         System.out.println(Art.BOOTSTRAP);
 
         Company company1 = Company.builder()
+                .name("Company1")
+
                 .email("company1@gmail.com")
                 .password("1234")
-                .name("Company 1")
+                .clientType(ClientType.COMPANY)
+
                 .build();
 
         Company company2 = Company.builder()
+                .name("Company2")
+
                 .email("company2@gmail.com")
                 .password("1234")
-                .name("Company 2")
+                .clientType(ClientType.COMPANY)
+
                 .build();
 
         Company company3 = Company.builder()
+                .name("Company3")
+
                 .email("company3@gmail.com")
                 .password("1234")
-                .name("Company 3")
+                .clientType(ClientType.COMPANY)
+
                 .build();
 
         Customer customer1 = Customer.builder()
@@ -71,6 +80,9 @@ public class Bootstrap implements CommandLineRunner {
                 .lastName("Cohen1")
                 .email("avi1@gmail.com")
                 .password("1234")
+                .clientType(ClientType.CUSTOMER)
+
+                .coupons(Collections.singletonList(couponRepository.getById(1)))
                 .build();
 
         Customer customer2 = Customer.builder()
@@ -78,6 +90,8 @@ public class Bootstrap implements CommandLineRunner {
                 .lastName("Cohen2")
                 .email("avi2@gmail.com")
                 .password("1234")
+                .clientType(ClientType.CUSTOMER)
+
                 .build();
 
         Customer customer3 = Customer.builder()
@@ -85,6 +99,8 @@ public class Bootstrap implements CommandLineRunner {
                 .lastName("Cohen3")
                 .email("avi3@gmail.com")
                 .password("1234")
+                .clientType(ClientType.CUSTOMER)
+
                 .build();
 
         Coupon coupon1 = Coupon.builder()
@@ -121,6 +137,18 @@ public class Bootstrap implements CommandLineRunner {
                 .description("blablabla3")
                 .title("title 3")
                 .company(companyRepository.getById(3))
+                .build();
+
+        Coupon coupon4 = Coupon.builder()
+                .amount(70)
+                .price(10)
+                .image("Coupon_4")
+                .startDate(Date.valueOf(LocalDate.now()))
+                .endDate(Date.valueOf(LocalDate.now().plusDays(7)))
+                .category(Category.VACATION)
+                .description("blablabla4")
+                .title("title 4")
+                .company(company1)
                 .build();
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

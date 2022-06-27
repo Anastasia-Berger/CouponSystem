@@ -19,50 +19,25 @@ import java.util.Map;
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, Integer> {
 
+    boolean existsByTitleAndCompanyId(String title, int companyId);
+
+    @Query(value = "SELECT * FROM coupon WHERE title =:title AND company_id=:companyID", nativeQuery = true)
+    Coupon getCouponByTitleAndCompanyId(@Param("title") String title, @Param("companyID") int companyID);
+
+
+    List<Coupon> findAllByCompanyId(int companyID);
+
+    @Query(value = "SELECT * FROM customer_vs_coupons WHERE coupons_id=:couponId", nativeQuery = true)
+    List<Integer> allCouponsPurchases(@Param("couponId") int couponId);
+
+    @Query(value = "SELECT * FROM customer_vs_coupons", nativeQuery = true)
+    Map<Integer, Integer> allPurchases();
+
     @Query(value = "SELECT COUNT(*) FROM customer_vs_coupons WHERE coupons_id=:couponID", nativeQuery = true)
     int allPurchasesOfCoupon(@Param("couponID") int couponID);
 
-
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM customer_vs_coupons WHERE coupons_id=:couponID", nativeQuery = true)
-    void deletePurchase(@Param("couponID") int couponID);
-
-    /////////////////////////////////////////////////////////////////////////
-
-    @Query(value = "from Coupon where company_id=:companyId")
-    List<Coupon> findAllByCompanyId(int companyId);
-
-    @Query(value = "from Coupon where company_id=:companyId AND category=:category")
-    List<Coupon> findAllByCompanyIdAndCategory(int companyId, Category category);
-
-    @Query(value = "from Coupon where company_id=:companyId AND price<=:maxPrice")
-    List<Coupon> findAllByCompanyIdAndPrice(int companyId, double maxPrice);
-
-    @Query(value = "select couplist.id from Customer c join c.coupons couplist where c.id=:customerId")
-    List<Integer> findCouponIdsByCustomerId(int customerId);
-
-    @Transactional
-    @Modifying
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @Query(value = "delete from Coupon where end_date<=:date")
-    int deleteAllByEndDateBefore(LocalDate date) throws CouponSystemException;
-
-    @Transactional
-    @Modifying
-    @Query(nativeQuery = true, value = "delete from customer_coupon where customer_id=:customerId and coupon_id=:couponId")
-    void deleteCouponPurchase(int customerId, int couponId) throws CouponSystemException;
-
-    @Query(value = "select couplist.id from Customer c join c.coupons couplist where c.id=:customerId and couplist.id=:couponId")
-    List<Integer> wasPurchased(int customerId, int couponId) throws CouponSystemException;
-
-
-    @Query(value = "select amount from Coupon where id=:couponId")
-    int getAmount(int couponId) throws CouponSystemException;
-
-
-	@Transactional
-	@Modifying
-	@Query(nativeQuery = true, value = "delete from customer_coupon where coupon_id=:couponId")
-	void deleteCouponHistory(int couponId) throws CouponSystemException;
+    @Query(value = "DELETE FROM customer_vs_coupons WHERE coupons_id=:couponId", nativeQuery = true)
+    void deletePurchase(@Param("couponId") int couponId);
 }

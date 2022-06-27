@@ -1,5 +1,6 @@
 package com.jb.CouponSystem.beans;
 
+import com.jb.CouponSystem.enums.ClientType;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 import com.jb.CouponSystem.exeptions.ErrMsg;
 import lombok.*;
@@ -15,7 +16,7 @@ import java.util.List;
 @Builder
 
 @Table(name = "companies")
-public class Company {
+public class Company extends Base {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,11 @@ public class Company {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @Singular
+    @Enumerated(EnumType.STRING)
+    private ClientType clientType;
+
+    @OneToMany
+    @JoinTable(name = "companies_vs_coupons")
     private List<Coupon> coupons = new ArrayList<>();
 
     public void setId(int id) throws CouponSystemException {

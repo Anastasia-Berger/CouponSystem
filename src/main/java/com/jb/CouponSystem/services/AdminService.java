@@ -6,11 +6,12 @@ import com.jb.CouponSystem.beans.Customer;
 import com.jb.CouponSystem.exeptions.CouponSystemException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AdminService {
 
     ////////////////////   LOGIN   ////////////////////////
-    public boolean login(String email, String password) throws CouponSystemException;
+    public UUID login(String email, String password) throws CouponSystemException;
 
     ////////////////////   COMPANIES   ////////////////////////
     public void addCompany(Company company) throws CouponSystemException;
@@ -18,7 +19,7 @@ public interface AdminService {
     public void deleteCompany(int companyID) throws CouponSystemException;
     public List<Company> getAllCompanies();
     public Company getOneCompany(int companyID);
-    public Boolean companyExistsByName(String companyName);
+    public boolean companyExistsByName(String companyName);
     public boolean companyExistsByEmail(String email);
 
     // Customers

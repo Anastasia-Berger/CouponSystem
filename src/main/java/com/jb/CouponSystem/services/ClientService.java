@@ -7,6 +7,8 @@ import com.jb.CouponSystem.repos.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public abstract class ClientService {
 
@@ -17,6 +19,6 @@ public abstract class ClientService {
     @Autowired
     protected CompanyRepository companyRepository;
 
-    public abstract boolean login(String email, String password) throws CouponSystemException;
+    public abstract UUID login(String email, String password) throws CouponSystemException;
 
 }

@@ -13,7 +13,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "coupons")
-public class Coupon {
+public class Coupon extends Base{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
